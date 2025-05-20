@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Single Player Tic-Tac-Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #1f4037, #99f2c8);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    :root {
+      --RESULT-DIALOG-WIDTH: min(85vw, 500px);
+      --HEADER-WIDTH: min(90vw, 550px);
+      --GAMEBOARD-SIDE: min(90vw, 470px);
+
+      --TITLE-FS: clamp(3rem, 13vw, 4.5rem);
+      --TURN-MSG-FS: clamp(1.5rem, 10vw, 2.5rem);
+      --PLAYER-SYMBOL-FS: clamp(2rem, 15vw, 5rem);
+      --FOOTER-FS: clamp(1rem, 5vw, 1.2rem);
+
+      --LIGHT-COLOR: rgb(216, 200, 173);
+      --EXTRA-LIGHT-COLOR: rgb(230, 223, 210);
+    }
+
+    header {
+      padding-top: 30px;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      margin: 0 auto;
+      padding: 20px 0;
+      width: var(--HEADER-WIDTH);
+      text-align: center;
+      font-size: var(--TITLE-FS);
+      background-color: var(--LIGHT-COLOR);
+      color: #333;
+      border-radius: 20px;
+    }
+
+    header h1:hover {
+      background-color: var(--EXTRA-LIGHT-COLOR);
+    }
+
+    main p {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: var(--TURN-MSG-FS);
+    }
+
+    .gameboard {
+      width: var(--GAMEBOARD-SIDE);
+      height: var(--GAMEBOARD-SIDE);
+      margin: 0 auto 30px auto;
+      padding: 20px;
+      border-radius: 20px;
+      background-color: var(--LIGHT-COLOR);
+
+      display: grid;
+      gap: 3px;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+
+    .gamecell {
+      border: 2px solid black;
+      font-size: var(--PLAYER-SYMBOL-FS);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .gamecell.taken {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .gamecell:hover:not(.taken) {
+      background-color: yellow;
+    }
+
+    #status {
+      font-size: var(--TURN-MSG-FS);
+      font-weight: 500;
+      color: #333;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    #resetBtn {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background-color: rgb(230, 223, 210);
+      color: #333;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #resetBtn:hover {
+      background-color: rgb(230, 223, 210);
+    }
+
+    footer {
+      margin-top: 40px;
+      color: black;
+      font-size: var(--FOOTER-FS);
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Play Tic-Tac-Toe</h1>
+  </header>
+
+  <main>
+    <div class="gameboard" id="board"></div>
+    <p id="status"></p>
+    <button id="resetBtn">Reset Game</button>
+  </main>
+
+  <footer>
+    &copy; 2025 Mini Games Hub
+  </footer>
+
+  <script>
+    const board = document.getElementById("board");
+    const status = document.getElementById("status");
+    let cells = Array(9).fill(null);
+    let player = "X", ai = "O";
+
+    function checkWinner(board, mark) {
+      const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return winPatterns.some(pattern => pattern.every(i => board[i] === mark));
+    }
+
+    function findBestMove() {
+      let empty = cells.map((v, i) => v === null ? i : null).filter(v => v !== null);
+      for (let i of empty) {
+        let copy = [...cells]; copy[i] = ai;
+        if (checkWinner(copy, ai)) return i;
+      }
+      for (let i of empty) {
+        let copy = [...cells]; copy[i] = player;
+        if (checkWinner(copy, player)) return i;
+      }
+      if (cells[4] === null) return 4;
+      let corners = [0, 2, 6, 8].filter(i => cells[i] === null);
+      if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+      return empty[Math.floor(Math.random() * empty.length)];
+    }
+
+    function handleClick(index) {
+      if (cells[index] || checkWinner(cells, player) || checkWinner(cells, ai)) return;
+      cells[index] = player;
+      render();
+      if (checkWinner(cells, player)) return (status.textContent = "You Win!");
+      if (!cells.includes(null)) return (status.textContent = "It's a Draw!");
+      setTimeout(() => {
+        let aiMove = findBestMove();
+        cells[aiMove] = ai;
+        render();
+        if (checkWinner(cells, ai)) status.textContent = "AI Wins!";
+      }, 300);
+    }
+
+    function render() {
+      board.innerHTML = "";
+      cells.forEach((val, i) => {
+        let cell = document.createElement("div");
+        cell.className = "gamecell" + (val ? " taken" : "");
+        cell.textContent = val || "";
+        cell.onclick = () => handleClick(i);
+        board.appendChild(cell);
+      });
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      cells = Array(9).fill(null);
+      status.textContent = "";
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

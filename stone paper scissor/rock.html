@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Rock Paper Scissors
+        </title>
+        <link rel="stylesheet" href="./css/style.css">
+    
+    </head>
+    <body class="main">
+
+        <script src="./script.js"></script>
+
+        <div class="main-box">
+
+            <div class="head">
+            <p>Rock, Paper & Scissors</p>
+            </div>  
+
+            <div class="three-button">
+
+            <button class="rps" onclick="
+                playGame('ROCK');
+                document.querySelector('.show-your-moves').innerHTML = 
+                `<img class='player-move-img' src='./icons/rock-emoji.png'>`;
+
+            ">
+                <img class="rps-icon" src="./icons/rock-emoji.png">
+            </button>
+
+            <button class="rps" onclick="
+                playGame('PAPER');
+                document.querySelector('.show-your-moves').innerHTML = 
+                `<img class='player-move-img' src='./icons/paper-emoji.png'>`;
+            ">
+                <img class="rps-icon" src="./icons/paper-emoji.png">
+            </button>
+
+            <button class="rps" onclick="
+                playGame('SCISSORS');
+                document.querySelector('.show-your-moves').innerHTML = 
+                `<img class='player-move-img' src='./icons/scissors-emoji.png'>`;
+
+                ">
+                <img class="rps-icon" src="./icons/scissors-emoji.png">
+            </button>
+
+            </div>
+
+            <div class="stats">
+
+            <p class="show-result"></p>
+
+            <div class="result-img">
+                <p>Your Move</p>
+                <div class="show-your-moves"></div>
+                <div class="show-comp-moves"></div>
+                <p>Computer Move</p>
+            </div>
+           
+            <p class="result-display"></p>
+
+            <div class="reset-button">
+            <button 
+                class="reset"
+                onclick="
+                count.Wins = 0;
+                count.Losses = 0;
+                count.Ties = 0;
+                localStorage.removeItem('count');
+                updateScore();
+                document.querySelector('.show-result').innerHTML = null;
+                document.querySelector('.show-comp-moves').innerHTML = null;
+                document.querySelector('.show-your-moves').innerHTML = null;
+                ">
+                Reset Score
+            </button>
+            </div>
+            </div>
+
+        </div>
+        
+    </body>
+</html>
